@@ -2,7 +2,9 @@
 
 一款单文件、零依赖的网页休闲游戏。云海之上的望潮镇，守灯人阿烬的灯油只剩七夜；每晚爬上屋顶接住坠落的星屑添进灯塔，让纸船找到回家的路。
 
-> 在线试玩：https://pcni70hct3kq.doubao.link/app/app_17jc6zuxqsp
+> 在线试玩：https://games.yufon.site/yundeng/
+>
+> 游戏总站（以后所有游戏都挂这里）：https://games.yufon.site/
 
 ![标题画面](assets/title.jpg)
 
@@ -85,3 +87,4 @@ server {
 ## License
 
 MIT，见 [LICENSE](LICENSE)。插画与代码由本项目作者使用 AI 辅助生成并整理，可自由使用、修改、商用；转载保留本仓库地址即可。
+
