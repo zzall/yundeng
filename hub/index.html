@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>屿风游戏台 · Yufon Games</title>
+<meta name="description" content="屿风做的小游戏集合：一个人做得完、玩得完、发得出去的单文件网页游戏。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a1014'/%3E%3Cpath d='M13 6l3-3 3 3-1.2 0v4h-3.6v-4z' fill='%23f0a955'/%3E%3Crect x='11' y='10' width='10' height='3' fill='%23c9d6d2'/%3E%3Cpath d='M12 13h8l3 15H9z' fill='%231c3a42'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+<style>
+:root{
+  --ink:#070d11; --line:rgba(201,214,210,.14);
+  --text:#e8ede9; --dim:rgba(232,237,233,.55); --amber:#f0a955;
+  --serif:"Noto Serif SC","Songti SC",serif; --sans:"Noto Sans SC","PingFang SC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 600px at 78% -8%, rgba(240,169,85,.10), transparent 62%),
+    radial-gradient(900px 520px at 6% 8%, rgba(80,150,160,.12), transparent 66%),
+    var(--ink);
+  color:var(--text); font-family:var(--sans); font-weight:300;
+  -webkit-font-smoothing:antialiased; line-height:1.7; min-height:100vh;
+}
+.wrap{max-width:980px; margin:0 auto; padding:56px 24px 72px}
+header{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; padding-bottom:18px; border-bottom:1px solid var(--line)}
+.brand{font-family:var(--serif); font-weight:600; font-size:20px; letter-spacing:.12em}
+.brand span{color:var(--amber)}
+.tag{font-size:12px; letter-spacing:.28em; color:var(--dim)}
+h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,5.4vw,54px); line-height:1.24; margin:44px 0 14px}
+h1 em{font-style:normal; color:var(--amber)}
+.lede{max-width:34em; color:var(--dim); font-size:15px; margin:0}
+.rule{height:1px; background:linear-gradient(90deg,var(--line),transparent); margin:38px 0 30px}
+.grid{display:grid; gap:20px; grid-template-columns:1fr; align-items:start}
+@media(min-width:760px){ .grid{grid-template-columns:1.35fr .65fr} }
+.card{display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, rgba(18,30,36,.72), rgba(10,17,22,.86)); border:1px solid var(--line); border-radius:2px}
+.card .cover{position:relative; aspect-ratio:16/10; overflow:hidden; background:#0b1418}
+.card .cover img{width:100%; height:100%; object-fit:cover; object-position:50% 38%; display:block}
+.card .cover::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(7,13,17,.10), rgba(7,13,17,.92))}
+.card .body{padding:22px; display:flex; flex-direction:column; gap:12px}
+.kicker{font-size:11px; letter-spacing:.26em; color:var(--amber)}
+.card h2{font-family:var(--serif); font-weight:600; font-size:24px; margin:0; letter-spacing:.02em}
+.card p{margin:0; color:var(--dim); font-size:14px}
+.meta{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:4px 0 2px; padding-top:14px; border-top:1px solid var(--line)}
+.meta div{font-size:12px; color:var(--dim)}
+.meta b{display:block; font-weight:500; font-size:14px; color:var(--text); margin-top:3px}
+.play{margin-top:6px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:15px 20px; background:var(--amber); color:#151007; text-decoration:none; font-weight:500; font-size:15px; letter-spacing:.04em; border-radius:2px; transition:transform .18s ease, box-shadow .18s ease}
+.play:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(240,169,85,.22)}
+.play svg{width:15px; height:15px; fill:#151007}
+.soon{border:1px dashed var(--line); border-radius:2px; padding:26px 22px; display:flex; flex-direction:column; justify-content:center; gap:10px; min-height:220px; background:linear-gradient(180deg, rgba(18,30,36,.28), rgba(10,17,22,.4))}
+.soon h2{font-family:var(--serif); font-weight:600; font-size:19px; margin:0; color:rgba(232,237,233,.8)}
+.soon p{margin:0; color:var(--dim); font-size:13px}
+.soon .tagline{font-size:11px; letter-spacing:.24em; color:rgba(240,169,85,.72)}
+footer{margin-top:48px; padding-top:22px; border-top:1px solid var(--line); display:flex; gap:18px; flex-wrap:wrap; align-items:center; justify-content:space-between; color:var(--dim); font-size:13px}
+footer a{color:var(--text); text-decoration:none; border-bottom:1px solid rgba(240,169,85,.45); padding-bottom:1px}
+footer a:hover{color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">屿风<span>·</span>游戏台</div>
+    <div class="tag">YUFON GAMES</div>
+  </header>
+
+  <h1>一个人做得完的<em>小游戏</em>。<br>玩得完，也发得出去。</h1>
+  <p class="lede">这里只放单文件网页游戏：零依赖、双击即玩、手机上单指可玩。每款都配一份复刻提示词，别人拿一句描述就能做出同款。</p>
+
+  <div class="rule"></div>
+
+  <div class="grid">
+    <article class="card">
+      <div class="cover"><img src="./assets/yundeng-cover.jpg" alt="云海之上的灯塔，提灯的守灯人"></div>
+      <div class="body">
+        <div class="kicker">已上线 · 第一款</div>
+        <h2>云灯 · 守灯人七夜</h2>
+        <p>灯油只剩七夜。每晚爬上屋顶，接住坠落的星屑添进灯塔，让一艘纸船找到回家的路。</p>
+        <div class="meta">
+          <div>类型<b>单指接光</b></div>
+          <div>一局<b>约 7 分钟</b></div>
+          <div>难度<b>先易后紧</b></div>
+        </div>
+        <a class="play" href="./yundeng/"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>开始守灯</a>
+      </div>
+    </article>
+
+    <aside class="soon">
+      <div class="tagline">NEXT</div>
+      <h2>位置留给下一款</h2>
+      <p>第二款在写。规则只有三条：一条操作线、一个明确的失败、一个情绪落点。做完就挂到这里。</p>
+      <p style="color:rgba(232,237,233,.32)">2026 年内</p>
+    </aside>
+  </div>
+
+  <footer>
+    <div>屿风 / Yufon · 单文件网页游戏</div>
+    <div><a href="https://github.com/zzall/yundeng" target="_blank" rel="noopener">云灯源码与复刻提示词 →</a></div>
+  </footer>
+
+</div>
+</body>
+</html>
