@@ -192,6 +192,48 @@ p{font-size:14.5px;line-height:2;color:#C9D3CE;margin:12px 0 0}
 #btnPause{right:56px}
 #btnSound{right:14px}
 
+/* ---------- 载入态 / 出错兜底 ---------- */
+#boot{
+  position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(70% 55% at 50% 38%, #16232A 0%, #060D12 62%, #04090B 100%);
+  transition:opacity .45s ease;
+}
+#boot.gone{opacity:0;pointer-events:none}
+#boot .in{text-align:center;padding:0 32px}
+#boot .lamp{width:46px;height:46px;margin:0 auto 20px;position:relative}
+#boot .lamp:before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 50% 46%, #FFE7BE 0%, #F0A955 44%, rgba(240,169,85,0) 74%);
+  animation:bootGlow 1.7s ease-in-out infinite;
+}
+#boot .lamp:after{
+  content:"";position:absolute;left:50%;top:32%;width:2px;height:24px;margin-left:-1px;border-radius:2px;
+  background:linear-gradient(#FFF3D6,#F0A955);
+}
+@keyframes bootGlow{0%,100%{transform:scale(.8);opacity:.5}50%{transform:scale(1);opacity:1}}
+#boot p{margin:0;font-size:13px;letter-spacing:.08em;color:#C9D3CE}
+#boot small{display:block;margin-top:12px;font-size:11px;line-height:1.9;color:rgba(233,237,230,.42)}
+#fatal{
+  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(4,9,11,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+#fatal.on{display:flex}
+#fatal .box{max-width:420px;width:100%;border:1px solid rgba(233,237,230,.14);border-radius:14px;background:#0C1618;padding:22px 20px}
+#fatal h2{margin:0;font-size:17px;color:#F0A955;letter-spacing:.02em}
+#fatal p{margin:10px 0 0;font-size:13px;line-height:1.85;color:#C9D3CE}
+#fatal pre{
+  margin:12px 0 0;max-height:24vh;overflow:auto;font-size:11px;line-height:1.7;color:rgba(233,237,230,.58);
+  background:rgba(0,0,0,.35);padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;
+}
+#fatal .acts{display:flex;gap:10px;margin-top:16px}
+#fatal .acts button{
+  flex:1;height:40px;border-radius:10px;border:1px solid rgba(233,237,230,.16);background:transparent;
+  color:#C9D3CE;font-size:13px;cursor:pointer;font-family:inherit;
+}
+#fatal .acts button.pri{background:#F0A955;border-color:#F0A955;color:#1A1206;font-weight:600}
+/* 插画没加载到时给一层暖底，别让整屏死黑 */
+img.art{background:radial-gradient(62% 52% at 50% 42%, #17262D 0%, #0A151A 55%, #060D12 100%)}
+
 @media (max-aspect-ratio:9/16){
   #stage{width:100%;height:auto}
 }
@@ -201,6 +243,29 @@ p{font-size:14.5px;line-height:2;color:#C9D3CE;margin:12px 0 0}
 </style>
 </head>
 <body>
+<div id="boot">
+  <div class="in">
+    <div class="lamp"></div>
+    <p id="bootMsg">正在点亮灯塔…</p>
+    <small>画面出来这块会自己消失。如果一直停在这里，等两秒会跳出提示。</small>
+  </div>
+</div>
+<div id="fatal">
+  <div class="box">
+    <h2 id="fatalTitle">画面没能点亮</h2>
+    <p id="fatalMsg">有些东西没能加载成功。点重试再来一次，还不行就把下面的信息发给我。</p>
+    <pre id="fatalInfo"></pre>
+    <div class="acts">
+      <button class="pri" id="fatalRetry">重试一次</button>
+      <button id="fatalCopy">复制诊断信息</button>
+    </div>
+  </div>
+</div>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:101;display:flex;align-items:center;justify-content:center;padding:24px;background:#060D12;color:#E9EDE6;font-family:sans-serif">
+    <p style="max-width:420px;line-height:1.9;font-size:14px">这个游戏靠 JavaScript 跑，你的浏览器把脚本关掉了。允许脚本以后刷新这一页，灯就亮了。</p>
+  </div>
+</noscript>
 <div id="app">
 <div id="stage">
   <canvas id="cv" width="720" height="1280" aria-label="云灯游戏画面"></canvas>
@@ -616,6 +681,61 @@ var G = C.G, ctx = C.ctx, cv = C.cv, $ = C.$;
 /* CORE 与 engine 各自在闭包里，CORE 里对这两个函数的裸调用需要挂到 window 才找得到 */
 window.renderIdleScene = renderIdleScene;
 window.startNight = startNight;
+
+/* ---------- 载入态 / 出错兜底 ---------- */
+var firstFrameAt = 0, assetsMissing = [];
+function diagText(){
+  return 'ua=' + (navigator.userAgent || '?') +
+         '\nviewport=' + window.innerWidth + 'x' + window.innerHeight +
+         '\ndpr=' + (window.devicePixelRatio || 1) +
+         '\nlink=' + location.href +
+         '\nasset=' + (assetsMissing.join(' | ') || 'ok');
+}
+function hideBoot(){
+  var b = $('boot');
+  if(!b || b.className.indexOf('gone') >= 0) return;
+  b.className += ' gone';
+  setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); }, 700);
+}
+function showFatal(title, msg, detail){
+  var box = $('fatal');
+  if(!box) return;
+  $('fatalTitle').textContent = title || '画面没能点亮';
+  $('fatalMsg').textContent = msg || '有些东西没能加载成功。';
+  $('fatalInfo').textContent = String(detail || '').slice(0, 500);
+  box.className = 'on';
+  hideBoot();
+}
+function wireFatalButtons(){
+  var r = $('fatalRetry'), c = $('fatalCopy');
+  if(r) r.onclick = function(){ location.reload(); };
+  if(c) c.onclick = function(){
+    var txt = $('fatalTitle').textContent + ' / ' + $('fatalMsg').textContent + '\n' + diagText();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ c.textContent = '已复制'; }, function(){ window.prompt('复制这段发给作者', txt); });
+    }else{
+      window.prompt('复制这段发给作者', txt);
+    }
+  };
+}
+/* 图片、样式这类资源挂了不算致命，记一笔就行；真正的脚本错误才弹面板 */
+window.addEventListener('error', function(e){
+  var t = e && e.target;
+  if(t && t.tagName && (t.tagName === 'IMG' || t.tagName === 'LINK' || t.tagName === 'SCRIPT')){
+    assetsMissing.push((t.getAttribute('src') || t.getAttribute('href') || '?').split('/').pop());
+    if(t.tagName === 'IMG') t.style.visibility = 'hidden';
+    return;
+  }
+  showFatal('游戏出了点问题',
+    '画面还在，但这一步走不下去了。点重试通常就好；一直不行就把下面的信息发给我。',
+    (e && (e.message || e.error)) + '\n' + diagText());
+}, true);
+window.addEventListener('unhandledrejection', function(e){
+  var r = e && e.reason;
+  showFatal('游戏出了点问题',
+    '有个后台操作失败了。点重试再来一次就行。',
+    String((r && (r.stack || r.message)) || r || '') + '\n' + diagText());
+});
 
 /* ---------- 随机 ---------- */
 function mulberry32(a){
@@ -1389,6 +1509,7 @@ function drawHUD(r){
 }
 
 function drawScene(r, dt){
+  if(!skyCache || !towerCache) return;   // 初始化没成功时由 showFatal 接管，这里别连环报错
   var tt = r ? r.t * 1000 : performance.now();
   var shake = r ? r.shake : 0;
   ctx.save();
@@ -1433,8 +1554,15 @@ function drawPlayerAmbient(tt){
 }
 
 /* ---------- 主循环 ---------- */
-var skyCache = buildSky();
-var towerCache = buildTower();
+var skyCache = null, towerCache = null;
+try{
+  skyCache = buildSky();
+  towerCache = buildTower();
+}catch(err){
+  showFatal('画面没能点亮',
+    '初始化绘制资源时出错了，这条路走不通。点重试一次多半会好，好不了就把下面的信息发给我。',
+    'buildSky/buildTower: ' + String((err && (err.stack || err.message)) || err) + '\n' + diagText());
+}
 var rafId = 0, last = 0, lastTick = 0;
 
 function loop(ts){
@@ -1480,6 +1608,10 @@ function endNight(run){
 
 function drawFrame(dt){
   drawScene(R.run && G.state === 'play' ? R.run : null, dt || 1 / 60);
+  if(!firstFrameAt && skyCache && towerCache){
+    firstFrameAt = Date.now();
+    hideBoot();
+  }
 }
 function renderIdleScene(){ drawFrame(); }
 
@@ -1520,6 +1652,13 @@ window.addEventListener('keydown', function(e){
     R.run.target = Math.min(W - 64, R.run.px + 90); e.preventDefault();
   }
   if(e.key === 'Escape'){ pauseGame(); }
+});
+
+/* 从别的标签页切回来时补一帧：有的浏览器会把动画停掉，切回来只看到黑屏 */
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){ drag = false; return; }
+  last = 0; lastTick = Date.now();
+  drawFrame();
 });
 
 function pauseGame(){
@@ -1775,16 +1914,54 @@ function runWalk(){
 /* ---------- 启动 ---------- */
 (function boot(){
   var q = new URLSearchParams(location.search);
-  if(q.get('selftest')){ runSelfTest(); return; }
-  C.load();
-  wireButtons();
-  if(q.get('walk')){ runWalk(); return; }
-  if(q.get('probe')){
-    applyProbe(q.get('probe'));
+  wireFatalButtons();
+
+  /* 已经挂在页面上的插画如果没下来，直接隐藏，别在标题页留个破图 */
+  Array.prototype.forEach.call(document.querySelectorAll('img.art'), function(img){
+    if(img.complete && !img.naturalWidth){ img.style.visibility = 'hidden'; }
+  });
+
+  if(!ctx){
+    showFatal('画面没能点亮',
+      '这个浏览器没能拿到画布。换用 Chrome、Edge 或者手机自带浏览器再打开试试。',
+      'canvas 2d context is null\n' + diagText());
     return;
   }
-  C.toTitle();
-  rafId = requestAnimationFrame(loop);
+  if(q.get('selftest')){ runSelfTest(); return; }
+  if(q.get('failtest')){
+    showFatal('画面没能点亮', '这是用来预览报错界面的测试入口，正常用户看到的就是这一屏，而不是一片黑。',
+      'failtest=1（测试用）\n' + diagText());
+    return;
+  }
+  try{
+    C.load();
+    wireButtons();
+    if(q.get('walk')){ runWalk(); return; }
+    if(q.get('probe')){
+      applyProbe(q.get('probe'));
+      drawFrame();                      // 调试入口也要收掉载入层
+      return;
+    }
+    C.toTitle();
+    drawFrame();                        // 先画一刀，不等 rAF
+    rafId = requestAnimationFrame(loop);
+    /* 兜底：8 秒还没画出第一帧，就明说，别让用户对着黑屏猜 */
+    setTimeout(function(){
+      if(!firstFrameAt){
+        showFatal('画面还在路上',
+          '等了 8 秒还没画出第一帧。可能是网络慢，也可能是浏览器把动画停掉了。点重试一般就好了。',
+          'no-first-frame\n' + diagText());
+      }
+    }, 8000);
+    /* 字体到了重画一次，免得标题和 HUD 用着备用字体 */
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){ drawFrame(); });
+    }
+  }catch(err){
+    showFatal('启动失败了',
+      '游戏没能起来。点重试再来一次；还不行就把下面的信息发给我，我照着改。',
+      String((err && (err.stack || err.message)) || err) + '\n' + diagText());
+  }
 })();
 
 window.__yundeng = { newRun:newRun, stepRun:stepRun, simulate:simulate, startNight:startNight };
