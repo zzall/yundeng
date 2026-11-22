@@ -3,102 +3,386 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>屿风游戏台 · Yufon Games</title>
-<meta name="description" content="屿风做的小游戏集合：一个人做得完、玩得完、发得出去的单文件网页游戏。">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a1014'/%3E%3Cpath d='M13 6l3-3 3 3-1.2 0v4h-3.6v-4z' fill='%23f0a955'/%3E%3Crect x='11' y='10' width='10' height='3' fill='%23c9d6d2'/%3E%3Cpath d='M12 13h8l3 15H9z' fill='%231c3a42'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+<title>Yufon 游戏台 · 310 款网页游戏，打开就能玩</title>
+<meta name="description" content="Yufon 游戏台：三个开源 H5 游戏合集 + Yufon 原创作品，310 款网页游戏点开即玩，支持联机。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23060a0e'/%3E%3Cpath d='M13 6l3-3 3 3-1.2 0v4h-3.6v-4z' fill='%23f2a94f'/%3E%3Crect x='11' y='10' width='10' height='3' fill='%23c9d6d2'/%3E%3Cpath d='M12 13h8l3 15H9z' fill='%231c3a42'/%3E%3C/svg%3E">
 <style>
 :root{
-  --ink:#070d11; --line:rgba(201,214,210,.14);
-  --text:#e8ede9; --dim:rgba(232,237,233,.55); --amber:#f0a955;
-  --serif:"Noto Serif SC","Songti SC",serif; --sans:"Noto Sans SC","PingFang SC",sans-serif;
+  --bg:#060a0e; --panel:rgba(255,255,255,.045);
+  --line:rgba(201,214,210,.13); --text:#e9eeea; --dim:rgba(233,238,234,.52);
+  --amber:#f2a94f; --amber2:#ffcf8a; --cyan:#57d6e6;
+  --serif:"Songti SC","Noto Serif SC",Georgia,serif;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:
-    radial-gradient(1200px 600px at 78% -8%, rgba(240,169,85,.10), transparent 62%),
-    radial-gradient(900px 520px at 6% 8%, rgba(80,150,160,.12), transparent 66%),
-    var(--ink);
-  color:var(--text); font-family:var(--sans); font-weight:300;
-  -webkit-font-smoothing:antialiased; line-height:1.7; min-height:100vh;
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.65;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block}
+
+#starfield{position:fixed;inset:0;z-index:0;opacity:.55;pointer-events:none}
+.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(900px 420px at 78% -10%,rgba(242,169,79,.13),transparent 60%),
+             radial-gradient(760px 460px at 4% 6%,rgba(87,214,230,.10),transparent 62%),
+             linear-gradient(180deg,rgba(6,10,14,.2),rgba(6,10,14,.9));}
+.spot{position:fixed;inset:-8%;z-index:0;pointer-events:none;opacity:0;transition:opacity .45s ease;
+  background-size:cover;background-position:center;filter:blur(64px) saturate(1.25) brightness(.55);transform:scale(1.05)}
+.spot.on{opacity:.5}
+
+.wrap{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:0 28px}
+header.top{position:sticky;top:0;z-index:40;backdrop-filter:blur(16px);background:rgba(6,10,14,.72);border-bottom:1px solid var(--line)}
+.top-in{max-width:1280px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:18px}
+.brand{font-family:var(--serif);font-size:18px;letter-spacing:.14em;white-space:nowrap}
+.brand b{color:var(--amber);font-weight:600}
+.search{flex:1;position:relative;max-width:520px}
+.search input{width:100%;padding:10px 14px 10px 38px;border-radius:999px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--text);font-size:14px;outline:none;font-family:var(--sans)}
+.search input:focus{border-color:rgba(242,169,79,.5);box-shadow:0 0 0 3px rgba(242,169,79,.10)}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.45;width:15px;height:15px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 16px;
+  font-size:13.5px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:.2s}
+.btn:hover{border-color:rgba(242,169,79,.55);color:var(--amber2);background:rgba(242,169,79,.08)}
+.btn.solid{background:var(--amber);border-color:var(--amber);color:#1a1205;font-weight:600}
+.btn.solid:hover{background:var(--amber2);color:#1a1205}
+
+.hero{padding:64px 0 34px;position:relative}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,5.6vw,68px);line-height:1.14;margin:18px 0 0;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--amber);position:relative;z-index:1}
+h1 em::after{content:"";position:absolute;left:0;right:0;bottom:.08em;height:.26em;background:linear-gradient(90deg,rgba(242,169,79,.32),transparent);z-index:-1}
+.lede{margin:18px 0 0;max-width:44em;color:var(--dim);font-size:15.5px}
+.lede b{color:var(--text);font-weight:500}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.stat{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 16px;min-width:120px}
+.stat b{display:block;font-family:var(--serif);font-size:24px;line-height:1.2;color:var(--amber2)}
+.stat span{font-size:12px;color:var(--dim);letter-spacing:.06em}
+
+.feature{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin:36px 0 46px}
+@media(max-width:860px){.feature{grid-template-columns:1fr}}
+.fcard{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;min-height:250px;
+  background:#0b1218;cursor:pointer;transition:transform .35s,border-color .35s}
+.fcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;transition:transform .6s,opacity .4s}
+.fcard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,14,.1) 20%,rgba(6,10,14,.92))}
+.fcard:hover{transform:translateY(-4px);border-color:rgba(242,169,79,.5)}
+.fcard:hover img{transform:scale(1.05);opacity:.9}
+.fcard .txt{position:absolute;inset:auto 0 0 0;z-index:2;padding:24px 26px}
+.fcard .tagline{font-size:12px;letter-spacing:.2em;color:var(--amber);text-transform:uppercase}
+.fcard h3{margin:8px 0 6px;font-family:var(--serif);font-size:26px;font-weight:600}
+.fcard p{margin:0;color:var(--dim);font-size:13.5px;max-width:36em}
+.fcard .go{position:absolute;right:22px;top:20px;z-index:2;font-size:12px;padding:6px 12px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(6,10,14,.5);backdrop-filter:blur(6px)}
+
+.filters{position:sticky;top:57px;z-index:30;padding:14px 0 12px;margin-bottom:6px;
+  background:linear-gradient(180deg,rgba(6,10,14,.96),rgba(6,10,14,.86) 70%,transparent);backdrop-filter:blur(10px)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 14px;font-size:13px;color:var(--dim);cursor:pointer;transition:.18s;user-select:none}
+.chip:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:#171006;font-weight:600}
+.chip small{opacity:.6;margin-left:6px;font-size:11px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;flex-wrap:wrap}
+.count{font-size:13px;color:var(--dim)}
+.count b{color:var(--text)}
+select{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;padding:7px 12px;font-size:13px;font-family:var(--sans);outline:none}
+.pick{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;user-select:none}
+.pick input{accent-color:var(--amber);margin:0}
+.pick:hover{color:var(--text)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:18px;padding:8px 0 70px}
+.card{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0a1116;
+  cursor:pointer;transition:transform .28s cubic-bezier(.2,.7,.3,1),border-color .28s,box-shadow .28s,opacity .5s;opacity:0;transform:translateY(14px)}
+.card.in{opacity:1;transform:translateY(0)}
+.card:hover{transform:translateY(-6px);border-color:rgba(242,169,79,.55);box-shadow:0 18px 40px -18px rgba(0,0,0,.9),0 0 0 1px rgba(242,169,79,.25)}
+.card .ph{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0d151b}
+.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.7,.3,1),filter .35s;filter:saturate(.92)}
+.card:hover .ph img{transform:scale(1.07);filter:saturate(1.1)}
+.card .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(6,10,14,.85))}
+.card .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:.3s;z-index:2}
+.card .play span{padding:9px 18px;border-radius:999px;background:rgba(242,169,79,.92);color:#171006;font-size:13px;font-weight:600;
+  box-shadow:0 8px 26px rgba(0,0,0,.5);transform:translateY(6px);transition:.3s}
+.card:hover .play{opacity:1}
+.card:hover .play span{transform:translateY(0)}
+.card .badge{position:absolute;left:10px;top:10px;z-index:2;font-size:11px;letter-spacing:.1em;padding:3px 8px;border-radius:6px;
+  background:rgba(6,10,14,.72);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(4px)}
+.card .badge.sss{color:#ffd479;border-color:rgba(255,212,121,.5)}
+.card .badge.ss{color:#8ce6c8;border-color:rgba(140,230,200,.35)}
+.card .badge.mp{color:var(--cyan);border-color:rgba(87,214,230,.5)}
+.card .meta{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.card h3{margin:0;font-size:15.5px;font-weight:500;line-height:1.35;letter-spacing:.01em}
+.card .cat{font-size:11px;color:var(--dim);white-space:nowrap;padding-bottom:2px}
+.empty{padding:70px 0;text-align:center;color:var(--dim)}
+
+.player{position:fixed;inset:0;z-index:80;display:none;background:rgba(4,7,10,.86);backdrop-filter:blur(8px)}
+.player.on{display:flex;flex-direction:column}
+.player .bar{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(8,13,17,.9)}
+.player .bar h4{margin:0;font-family:var(--serif);font-size:17px}
+.player .bar .c{font-size:12px;color:var(--dim)}
+.player .bar .sp{flex:1}
+.player iframe{flex:1;width:100%;border:0;background:#000}
+.player .licbar{font-size:12px;letter-spacing:.02em;color:rgba(233,238,234,.62);background:rgba(6,9,12,.9);border-top:1px solid var(--line);padding:6px 20px;text-align:center}
+.loading{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(4,7,10,.6)}
+.loading.on{display:flex}
+.spin{width:38px;height:38px;border-radius:50%;border:2px solid rgba(242,169,79,.25);border-top-color:var(--amber);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:30px 0 46px;color:var(--dim);font-size:12.5px}
+footer a{color:rgba(233,238,234,.75);border-bottom:1px solid rgba(255,255,255,.15)}
+footer a:hover{color:var(--amber2)}
+.contact{
+  margin:46px auto 0;padding:24px;border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  display:flex;gap:26px;align-items:center;justify-content:space-between;flex-wrap:wrap;
 }
-.wrap{max-width:980px; margin:0 auto; padding:56px 24px 72px}
-header{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; padding-bottom:18px; border-bottom:1px solid var(--line)}
-.brand{font-family:var(--serif); font-weight:600; font-size:20px; letter-spacing:.12em}
-.brand span{color:var(--amber)}
-.tag{font-size:12px; letter-spacing:.28em; color:var(--dim)}
-h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,5.4vw,54px); line-height:1.24; margin:44px 0 14px}
-h1 em{font-style:normal; color:var(--amber)}
-.lede{max-width:34em; color:var(--dim); font-size:15px; margin:0}
-.rule{height:1px; background:linear-gradient(90deg,var(--line),transparent); margin:38px 0 30px}
-.grid{display:grid; gap:20px; grid-template-columns:1fr; align-items:start}
-@media(min-width:760px){ .grid{grid-template-columns:1.35fr .65fr} }
-.card{display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, rgba(18,30,36,.72), rgba(10,17,22,.86)); border:1px solid var(--line); border-radius:2px}
-.card .cover{position:relative; aspect-ratio:16/10; overflow:hidden; background:#0b1418}
-.card .cover img{width:100%; height:100%; object-fit:cover; object-position:50% 38%; display:block}
-.card .cover::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(7,13,17,.10), rgba(7,13,17,.92))}
-.card .body{padding:22px; display:flex; flex-direction:column; gap:12px}
-.kicker{font-size:11px; letter-spacing:.26em; color:var(--amber)}
-.card h2{font-family:var(--serif); font-weight:600; font-size:24px; margin:0; letter-spacing:.02em}
-.card p{margin:0; color:var(--dim); font-size:14px}
-.meta{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:4px 0 2px; padding-top:14px; border-top:1px solid var(--line)}
-.meta div{font-size:12px; color:var(--dim)}
-.meta b{display:block; font-weight:500; font-size:14px; color:var(--text); margin-top:3px}
-.play{margin-top:6px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:15px 20px; background:var(--amber); color:#151007; text-decoration:none; font-weight:500; font-size:15px; letter-spacing:.04em; border-radius:2px; transition:transform .18s ease, box-shadow .18s ease}
-.play:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(240,169,85,.22)}
-.play svg{width:15px; height:15px; fill:#151007}
-.soon{border:1px dashed var(--line); border-radius:2px; padding:26px 22px; display:flex; flex-direction:column; justify-content:center; gap:10px; min-height:220px; background:linear-gradient(180deg, rgba(18,30,36,.28), rgba(10,17,22,.4))}
-.soon h2{font-family:var(--serif); font-weight:600; font-size:19px; margin:0; color:rgba(232,237,233,.8)}
-.soon p{margin:0; color:var(--dim); font-size:13px}
-.soon .tagline{font-size:11px; letter-spacing:.24em; color:rgba(240,169,85,.72)}
-footer{margin-top:48px; padding-top:22px; border-top:1px solid var(--line); display:flex; gap:18px; flex-wrap:wrap; align-items:center; justify-content:space-between; color:var(--dim); font-size:13px}
-footer a{color:var(--text); text-decoration:none; border-bottom:1px solid rgba(240,169,85,.45); padding-bottom:1px}
-footer a:hover{color:var(--amber)}
+.ct-h b{display:block;font-size:16px;color:var(--ink);letter-spacing:.02em}
+.ct-h span{display:block;margin-top:8px;font-size:12.5px;line-height:1.8;color:var(--dim);max-width:24em}
+.ct-qrs{display:flex;gap:20px}
+.qr{margin:0;text-align:center}
+.qr img{width:128px;height:128px;object-fit:cover;border-radius:10px;background:#0B1417;box-shadow:0 0 0 1px var(--line);display:block}
+.qr figcaption{margin-top:9px;font-size:11.5px;color:var(--dim)}
+@media(max-width:640px){
+  .wrap,.top-in{padding-left:16px;padding-right:16px}
+  .hero{padding-top:40px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .filters{top:53px}
+  .fcard{min-height:200px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
+<canvas id="starfield"></canvas>
+<div class="bg-glow"></div>
+<div class="spot" id="spot"></div>
 
-  <header>
-    <div class="brand">屿风<span>·</span>游戏台</div>
-    <div class="tag">YUFON GAMES</div>
-  </header>
-
-  <h1>一个人做得完的<em>小游戏</em>。<br>玩得完，也发得出去。</h1>
-  <p class="lede">这里只放单文件网页游戏：零依赖、双击即玩、手机上单指可玩。每款都配一份复刻提示词，别人拿一句描述就能做出同款。</p>
-
-  <div class="rule"></div>
-
-  <div class="grid">
-    <article class="card">
-      <div class="cover"><img src="./assets/yundeng-cover.jpg" alt="云海之上的灯塔，提灯的守灯人"></div>
-      <div class="body">
-        <div class="kicker">已上线 · 第一款</div>
-        <h2>云灯 · 守灯人七夜</h2>
-        <p>灯油只剩七夜。每晚爬上屋顶，接住坠落的星屑添进灯塔，让一艘纸船找到回家的路。</p>
-        <div class="meta">
-          <div>类型<b>单指接光</b></div>
-          <div>一局<b>约 7 分钟</b></div>
-          <div>难度<b>先易后紧</b></div>
-        </div>
-        <a class="play" href="./yundeng/"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>开始守灯</a>
-      </div>
-    </article>
-
-    <aside class="soon">
-      <div class="tagline">NEXT</div>
-      <h2>位置留给下一款</h2>
-      <p>第二款在写。规则只有三条：一条操作线、一个明确的失败、一个情绪落点。做完就挂到这里。</p>
-      <p style="color:rgba(232,237,233,.32)">2026 年内</p>
-    </aside>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Yufon · <b>GAME ROOM</b></div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+      <input id="q" type="search" placeholder="搜索游戏名、类型、关键词    按 / 快速搜索" autocomplete="off">
+    </label>
+    <button class="btn" id="random">随机开一局</button>
   </div>
+</header>
 
-  <footer>
-    <div>屿风 / Yufon · 单文件网页游戏</div>
-    <div><a href="https://github.com/zzall/yundeng" target="_blank" rel="noopener">云灯源码与复刻提示词 →</a></div>
-  </footer>
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker"><i></i><span>OPEN SOURCE ARCADE · 开源街机厅</span></div>
+    <h1>310 款网页游戏，<br><em>打开就能玩</em>。</h1>
+    <p class="lede">四个开源 H5 合集 + Yufon 自己的作品，全部<b>免费、免安装、免登录</b>。点开卡片直接开局，其中《星团大作战》支持<b>互联网好友联机</b>。</p>
+    <div class="stats">
+      <div class="stat"><b id="s-total">310</b><span>款可玩游戏</span></div>
+      <div class="stat"><b>4</b><span>个开源合集</span></div>
+      <div class="stat"><b>1</b><span>个联机服务</span></div>
+      <div class="stat"><b>100%</b><span>自托管 · 无广告</span></div>
+    </div>
+  </section>
 
+  <section class="feature">
+    <div class="fcard" data-feature="sca">
+      <img src="/assets/covers/sca-hero.jpg" alt="深空里发光的星团球体">
+      <div class="go">联机 · 十种模式</div>
+      <div class="txt">
+        <div class="tagline">Multiplayer</div>
+        <h3>星团大作战</h3>
+        <p>吞噬、分裂、围猎。单人打 AI，或者开一间好友房，把邀请码丢给朋友。</p>
+      </div>
+    </div>
+    <div class="fcard" data-feature="yundeng">
+      <img src="/assets/yundeng-cover.jpg" alt="">
+      <div class="go">本家作品</div>
+      <div class="txt">
+        <div class="tagline">Yufon Original</div>
+        <h3>云灯</h3>
+        <p>点灯、过夜、看云起。Yufon 自己写的单文件小游戏。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="filters">
+    <div class="chips" id="cats"></div>
+    <div class="toolbar">
+      <div class="count" id="count"></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="src">
+          <option value="">全部来源</option>
+          <option value="星坊合集">星坊合集 · 107</option>
+          <option value="Sausi 合集">Sausi 合集 · 142</option>
+          <option value="街机 60">街机 60 · 60</option>
+          <option value="MY-Games-01">MY-Games-01 · 420</option>
+          <option value="本家作品">本家作品</option>
+        </select>
+        <select id="sort">
+          <option value="rec" selected>推荐排序 · 封面优先</option>
+          <option value="default">默认排序</option>
+          <option value="az">按名称</option>
+          <option value="tier">按评级</option>
+        </select>
+        <label class="pick"><input type="checkbox" id="only-good"> 只看精品封面</label>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="player" id="player">
+  <div class="bar">
+    <h4 id="p-title">—</h4><span class="c" id="p-cat"></span>
+    <span class="sp"></span>
+    <button class="btn" id="p-new">在新窗口打开</button>
+    <button class="btn" id="p-full">全屏</button>
+    <button class="btn solid" id="p-close">关闭 ESC</button>
+  </div>
+  <div class="licbar">仅限个人试玩 · 禁止任何商业使用（转载/售卖/换皮/嵌入商业产品均不可）</div>
+  <iframe id="p-frame" allowfullscreen allow="fullscreen; gamepad; autoplay"></iframe>
 </div>
+<div class="loading" id="loading"><div class="spin"></div></div>
+
+<section class="wrap contact" id="contact">
+  <div class="ct-h">
+    <b>联系 Yufon</b>
+    <span>做游戏、聊实现、要源码，扫码都能找到我。公众号会发新的小东西，微信直接说话就行。</span>
+  </div>
+  <div class="ct-qrs">
+    <figure class="qr"><img src="/assets/qr-gzh.jpg" alt="公众号二维码" onerror="this.closest('figure').remove()"><figcaption>公众号</figcaption></figure>
+    <figure class="qr"><img src="/assets/qr-wechat.jpg" alt="个人微信二维码" onerror="this.closest('figure').remove()"><figcaption>个人微信</figcaption></figure>
+  </div>
+</section>
+<script>window.addEventListener('load',function(){var s=document.getElementById('contact');if(s&&!s.querySelector('.qr'))s.remove();});</script>
+<footer class="wrap">
+  <div>游戏来自开源项目：<a href="https://github.com/wangzifan396-wzf/mini-browser-games" target="_blank" rel="noopener">mini-browser-games</a>（MIT） ·
+    <a href="https://github.com/sausi-7/games" target="_blank" rel="noopener">sausi-7/games</a>（MIT） ·
+    <a href="https://github.com/chengzuopeng/game-space" target="_blank" rel="noopener">chengzuopeng/game-space</a>（MIT） ·
+    <a href="https://github.com/ZCX-Priv/MY-Games-01" target="_blank" rel="noopener">ZCX-Priv/MY-Games-01</a>，版权归原作者所有。</div>
+  <div style="margin-top:8px"><b style="color:rgba(233,238,234,.9)">非商用版本</b>：全部游戏仅供个人学习与试玩，<b>禁止任何商业使用</b>（不得转载售卖、不得换皮上架、不得嵌入付费产品或广告）。详见 <a href="/notice.html">非商用声明</a>。</div>
+  <div style="margin-top:8px">由 Yufon 自托管于 games.yufon.site · <span id="foot-count">310</span> 款游戏 · 无广告、无追踪。</div>
+</footer>
+
+<script>
+/* 背景星尘 */
+(function(){
+  const c=document.getElementById('starfield'),x=c.getContext('2d');let w,h,ps=[];
+  function size(){w=c.width=innerWidth*devicePixelRatio;h=c.height=innerHeight*devicePixelRatio;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';}
+  function init(){ps=[];for(let i=0;i<90;i++)ps.push({x:Math.random()*w,y:Math.random()*h,z:Math.random()*1.6+.3,v:Math.random()*.25+.05,r:Math.random()*1.5+.4});}
+  size();init();addEventListener('resize',function(){size();init();});
+  (function loop(){
+    x.clearRect(0,0,w,h);
+    for(const p of ps){p.y-=p.v*devicePixelRatio;if(p.y<0){p.y=h;p.x=Math.random()*w;}
+      x.fillStyle='rgba(180,220,240,'+(p.z*.35)+')';x.beginPath();x.arc(p.x,p.y,p.r*devicePixelRatio,0,7);x.fill();}
+    requestAnimationFrame(loop);
+  })();
+})();
+
+var $=function(s){return document.querySelector(s);};
+var grid=$('#grid'), spot=$('#spot'), player=$('#player'), frame=$('#p-frame'), loading=$('#loading');
+var all=[], cur={cat:'全部',src:'',q:''};
+var TIER={SSS:1,SS:2,S:3,A:4,B:5,'':9};
+
+function esc(s){return String(s||'').replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
+
+async function load(){
+  var r=await fetch('catalog.json',{cache:'no-store'});
+  var d=await r.json();
+  all=d.games.filter(function(g){return g.game!==false;});
+  $('#s-total').textContent=all.length; $('#foot-count').textContent=all.length;
+  $('h1').innerHTML=all.length+' 款网页游戏，<br><em>打开就能玩</em>。';
+  buildCats(); render();
+}
+
+function buildCats(){
+  var box=$('#cats'); box.innerHTML='';
+  var counts={}; all.forEach(function(g){counts[g.cat]=(counts[g.cat]||0)+1;});
+  var cats=['全部'].concat(Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}));
+  cats.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='chip'+(c===cur.cat?' on':'');
+    el.innerHTML=esc(c)+(counts[c]?'<small>'+counts[c]+'</small>':'');
+    el.onclick=function(){cur.cat=c; Array.prototype.forEach.call(box.children,function(x){x.classList.toggle('on',x===el);}); render();};
+    box.appendChild(el);
+  });
+}
+
+function render(){
+  var onlyGood=$('#only-good').checked;
+  var list=all.filter(function(g){
+    if(cur.cat!=='全部' && g.cat!==cur.cat) return false;
+    if(cur.src && g.srcName!==cur.src) return false;
+    if(onlyGood && (g.q||0)<82) return false;
+    if(cur.q){
+      var q=cur.q.toLowerCase();
+      if((g.title+' '+g.desc+' '+g.cat+' '+g.srcName).toLowerCase().indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+  var sort=$('#sort').value;
+  if(sort==='az') list.sort(function(a,b){return a.title.localeCompare(b.title,'zh');});
+  if(sort==='rec'){
+    list.sort(function(a,b){
+      var d=(b.q||0)-(a.q||0);
+      return d!==0?d:((TIER[a.badge]||9)-(TIER[b.badge]||9));
+    });
+  }
+  if(sort==='tier'||(cur.cat==='全部'&&!cur.q&&!cur.src&&sort==='default')){
+    list.sort(function(a,b){return (TIER[a.badge]||9)-(TIER[b.badge]||9);});
+  }
+  $('#count').innerHTML='共 <b>'+list.length+'</b> 款'+(cur.cat!=='全部'?' · '+esc(cur.cat):'')+(cur.q?' · 搜索“'+esc(cur.q)+'”':'');
+  grid.innerHTML='';
+  if(!list.length){grid.innerHTML='<div class="empty">没有匹配的游戏，换个关键词试试。</div>';return;}
+  var frag=document.createDocumentFragment();
+  list.forEach(function(g){
+    var el=document.createElement('article');
+    el.className='card'; el.dataset.id=g.id;
+    var badge=g.badge==='联机'?'<span class="badge mp">联机</span>':(g.badge?'<span class="badge '+(g.badge==='SSS'?'sss':g.badge==='SS'?'ss':'')+'">'+esc(g.badge)+'</span>':'');
+    el.innerHTML='<div class="ph"><img loading="lazy" src="'+g.cover+'" alt="'+esc(g.title)+'" onerror="this.style.opacity=.25">'
+      +badge+'<div class="play"><span>▶ 开始游戏</span></div></div>'
+      +'<div class="meta"><h3>'+esc(g.title)+'</h3><span class="cat">'+esc(g.cat)+'</span></div>';
+    el.addEventListener('mouseenter',function(){spot.style.backgroundImage='url("'+g.cover+'")';spot.classList.add('on');});
+    el.addEventListener('mouseleave',function(){spot.classList.remove('on');});
+    el.addEventListener('click',function(){open(g);});
+    frag.appendChild(el);
+  });
+  grid.appendChild(frag);
+  requestAnimationFrame(function(){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{rootMargin:'80px'});
+    Array.prototype.forEach.call(grid.children,function(c,i){c.style.transitionDelay=(Math.min(i,12)*22)+'ms';io.observe(c);});
+  });
+}
+
+function open(g){
+  if(g.external){ window.open(g.url,'_blank','noopener'); return; }
+  $('#p-title').textContent=g.title; $('#p-cat').textContent=g.cat+' · '+g.srcName;
+  loading.classList.add('on');
+  setTimeout(function(){loading.classList.remove('on');},250);
+  frame.src=g.url;
+  player.classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closePlayer(){
+  player.classList.remove('on'); frame.src='about:blank'; document.body.style.overflow='';
+}
+$('#p-close').onclick=closePlayer;
+$('#p-new').onclick=function(){ if(frame.src&&frame.src!=='about:blank') window.open(frame.src,'_blank','noopener'); };
+$('#p-full').onclick=function(){ if(frame.requestFullscreen) frame.requestFullscreen(); };
+addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&player.classList.contains('on')) closePlayer();
+  if(e.key==='/'&&document.activeElement!==$('#q')){e.preventDefault();$('#q').focus();}
+});
+$('#q').oninput=function(e){cur.q=e.target.value.trim();render();};
+$('#src').onchange=function(e){cur.src=e.target.value;render();};
+$('#sort').onchange=render;
+$('#only-good').onchange=render;
+$('#random').onclick=function(){
+  var pool=all.slice(); if(cur.cat!=='全部') pool=pool.filter(function(g){return g.cat===cur.cat;});
+  if(!pool.length) return; open(pool[Math.floor(Math.random()*pool.length)]);
+};
+Array.prototype.forEach.call(document.querySelectorAll('.fcard'),function(f){
+  f.onclick=function(){
+    if(f.dataset.feature==='sca') window.open('/sca/','_blank','noopener');
+    else { var g=all.filter(function(x){return x.id==='yundeng';})[0]; if(g) open(g); }
+  };
+});
+load();
+</script>
 </body>
 </html>
